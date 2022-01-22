@@ -1,0 +1,31 @@
+﻿.char-input-control {
+    width: 3rem;
+    height: 3rem;
+}
+
+.grid-column {
+    display: grid;
+    gap: .5rem;
+    grid-template-columns: repeat(5,1fr)
+}
+
+.character-indexmeta-control {
+    display: grid;
+    grid-template-rows: repeat(2,1fr)
+}
+
+.grid-container {
+    margin-top:40px;
+    max-width: 300px;
+    display: flex;
+    flex-direction:column;
+    align-items: center;
+    justify-content: center;
+}
+
+.words-container {
+    scroll-behavior:auto;
+    max-height: 500px;
+}
+
+

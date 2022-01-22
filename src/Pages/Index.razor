@@ -1,0 +1,152 @@
+﻿@page "/"
+@inject HttpClient Http
+
+<PageTitle>Index</PageTitle>
+
+<div class="grid-container form-controls-container">
+    <input type="text" @bind="@CharsNotIcluded" class="form-control form-control-lg" placeholder="characters not in word">
+    <br />
+    <div class="grid-column">
+        <div class="character-indexmeta-control">
+            <input @bind="@CharAtIndex_0.Char" maxlength="1" type="text" class="char-input-control form-control form-control-lg" placeholder="a">
+            <input type="checkbox" @bind="@CharAtIndex_0.IndexMeta" class="btn-check" id="btn-check-0-outlined" autocomplete="off">
+            <label class="btn btn-outline-primary char-input-control" for="btn-check-0-outlined"></label>
+        </div>
+        <div class="character-indexmeta-control">
+            <input @bind="@CharAtIndex_1.Char" maxlength="1" type="text" class="char-input-control form-control form-control-lg" placeholder="b">
+            <input type="checkbox" @bind="@CharAtIndex_1.IndexMeta" class="btn-check" id="btn-check-1-outlined" autocomplete="off">
+            <label class="btn btn-outline-primary char-input-control" for="btn-check-1-outlined"></label>
+        </div>
+        <div class="character-indexmeta-control">
+            <input @bind="@CharAtIndex_2.Char" maxlength="1" type="text" class="char-input-control form-control form-control-lg" placeholder="c">
+            <input type="checkbox" @bind="@CharAtIndex_2.IndexMeta" class="btn-check" id="btn-check-2-outlined" autocomplete="off">
+            <label class="btn btn-outline-primary char-input-control" for="btn-check-2-outlined"></label>
+        </div>
+        <div class="character-indexmeta-control">
+            <input @bind="@CharAtIndex_3.Char" maxlength="1" type="text" class="char-input-control form-control form-control-lg" placeholder="d">
+            <input type="checkbox" @bind="@CharAtIndex_3.IndexMeta" class="btn-check" id="btn-check-3-outlined" autocomplete="off">
+            <label class="btn btn-outline-primary char-input-control" for="btn-check-3-outlined"></label>
+        </div>
+        <div class="character-indexmeta-control">
+            <input @bind="@CharAtIndex_4.Char" maxlength="1" type="text" class="char-input-control form-control form-control-lg" placeholder="e">
+            <input type="checkbox" @bind="@CharAtIndex_4.IndexMeta" class="btn-check" id="btn-check-4-outlined" autocomplete="off">
+            <label class="btn btn-outline-primary char-input-control" for="btn-check-4-outlined"></label>
+        </div>
+    </div>
+    <br />
+    <button type="button" @onclick="@OnClick" class="btn btn-primary">Primary</button>
+    <br />
+</div>
+
+<div class="words-container">
+    @foreach (var word in filteredWords)
+    {
+        <span class="badge rounded-pill bg-light text-dark">@word</span>
+    }
+</div>
+
+
+@code {
+    private string[] cachedWords = Array.Empty<string>();
+    private string[] filteredWords = Array.Empty<string>();
+
+    private string CharsNotIcluded { get; set; } = "";
+
+    private CharIndexMetaPair CharAtIndex_0 { get; set; } = new();
+    private CharIndexMetaPair CharAtIndex_1 { get; set; } = new();
+    private CharIndexMetaPair CharAtIndex_2 { get; set; } = new();
+    private CharIndexMetaPair CharAtIndex_3 { get; set; } = new();
+    private CharIndexMetaPair CharAtIndex_4 { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        cachedWords = await Http.GetFromJsonAsync<string[]>("sample-data/words.json") ?? Array.Empty<string>();
+        filteredWords = cachedWords;
+    }
+
+    private void  OnClick()
+    {
+        filteredWords = GetWordsThatExcludesChars(cachedWords, CharsNotIcluded.ToCharArray());
+
+        var CharsAtWrongIndex = new CharIndexMetaPair[] 
+        { 
+            CharAtIndex_0,
+            CharAtIndex_1,
+            CharAtIndex_2,
+            CharAtIndex_3,
+            CharAtIndex_4
+        };
+
+        filteredWords = FilterWordsByCharIndexMeta(filteredWords, CharsAtWrongIndex);
+    }
+
+
+    private string[] GetWordsThatExcludesChars(string[] words, char[] notIncChar)
+    {
+        if (!notIncChar.Any()) return words;
+
+        var filteredWords = words
+            .Where(c => c.IndexOfAny(notIncChar) < 0)
+            .ToArray();
+
+        return filteredWords is null || !filteredWords.Any() ? words : filteredWords; 
+    }
+
+    private string[] FilterWordsByCharIndexMeta(string[] words, CharIndexMetaPair[] charIndexMetaPairs)
+    {
+        if (IsCharArrayEmpty(charIndexMetaPairs)) return words;
+
+        var eligibleWords = new List<string>();
+        foreach (var word in words)
+        {
+            var isWordEligible = false;
+            for (var i = 0; i < charIndexMetaPairs.Length; i++)
+            {
+                if (IsNullChar(charIndexMetaPairs[i].Char)) continue;
+
+                if (IsCharInWordAndAtCorrectIndex(word, charIndexMetaPairs[i], i))
+                {
+                    isWordEligible = true;
+                }
+                else
+                {
+                    isWordEligible = false;
+                    break;
+                }
+            }
+
+            if (isWordEligible)
+            { 
+                eligibleWords.Add(word);
+            }
+        }
+
+        return eligibleWords.ToArray();
+
+        ///Local Functions
+        bool IsCharArrayEmpty(CharIndexMetaPair[] filterChars) => !filterChars.Any(c => c.Char != '\0');
+
+        bool IsNullChar(char c) => c == '\0';
+
+        bool IsCharInWordAndAtCorrectIndex(string word, CharIndexMetaPair charIndexMetaPair, int charIndex)
+        {
+            if (charIndexMetaPair.IndexMeta)
+            {
+                return charIndexMetaPair.Char == (word.ToCharArray())[charIndex];
+            }
+            else
+            {
+                var indexOfCharInWord = word.IndexOf(charIndexMetaPair.Char);
+                return charIndexMetaPair.Char != (word.ToCharArray())[charIndex] && indexOfCharInWord >= 0;
+            }
+        }
+        ///End Local Function
+    }
+
+    class CharIndexMetaPair
+    {
+        public char Char { get; set; } = '\0';
+        public bool IndexMeta { get; set; }
+    }
+
+}
