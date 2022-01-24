@@ -3,38 +3,40 @@
 
 <PageTitle>Index</PageTitle>
 
-<div class="grid-container form-controls-container">
-    <input type="text" @bind="@CharsNotIcluded" class="form-control form-control-lg" placeholder="characters not in word">
+<div class="grid-container">
+    <input type="text" @bind="@CharsNotIcluded" class="form-control form-control-lg" placeholder="chars not in word">
     <br />
     <div class="grid-column">
         <div class="character-indexmeta-control">
             <input @bind="@CharAtIndex_0.Char" maxlength="1" type="text" class="char-input-control form-control form-control-lg" placeholder="a">
             <input type="checkbox" @bind="@CharAtIndex_0.IndexMeta" class="btn-check" id="btn-check-0-outlined" autocomplete="off">
-            <label class="btn btn-outline-primary char-input-control" for="btn-check-0-outlined"></label>
+            <label class="shadow-sm btn btn-outline-primary char-input-control" for="btn-check-0-outlined"></label>
         </div>
         <div class="character-indexmeta-control">
             <input @bind="@CharAtIndex_1.Char" maxlength="1" type="text" class="char-input-control form-control form-control-lg" placeholder="b">
             <input type="checkbox" @bind="@CharAtIndex_1.IndexMeta" class="btn-check" id="btn-check-1-outlined" autocomplete="off">
-            <label class="btn btn-outline-primary char-input-control" for="btn-check-1-outlined"></label>
+            <label class="shadow-sm btn btn-outline-primary char-input-control" for="btn-check-1-outlined"></label>
         </div>
         <div class="character-indexmeta-control">
             <input @bind="@CharAtIndex_2.Char" maxlength="1" type="text" class="char-input-control form-control form-control-lg" placeholder="c">
             <input type="checkbox" @bind="@CharAtIndex_2.IndexMeta" class="btn-check" id="btn-check-2-outlined" autocomplete="off">
-            <label class="btn btn-outline-primary char-input-control" for="btn-check-2-outlined"></label>
+            <label class="shadow-sm btn btn-outline-primary char-input-control" for="btn-check-2-outlined"></label>
         </div>
         <div class="character-indexmeta-control">
             <input @bind="@CharAtIndex_3.Char" maxlength="1" type="text" class="char-input-control form-control form-control-lg" placeholder="d">
             <input type="checkbox" @bind="@CharAtIndex_3.IndexMeta" class="btn-check" id="btn-check-3-outlined" autocomplete="off">
-            <label class="btn btn-outline-primary char-input-control" for="btn-check-3-outlined"></label>
+            <label class="shadow-sm btn btn-outline-primary char-input-control" for="btn-check-3-outlined"></label>
         </div>
         <div class="character-indexmeta-control">
             <input @bind="@CharAtIndex_4.Char" maxlength="1" type="text" class="char-input-control form-control form-control-lg" placeholder="e">
             <input type="checkbox" @bind="@CharAtIndex_4.IndexMeta" class="btn-check" id="btn-check-4-outlined" autocomplete="off">
-            <label class="btn btn-outline-primary char-input-control" for="btn-check-4-outlined"></label>
+            <label class="shadow-sm btn btn-outline-primary char-input-control" for="btn-check-4-outlined"></label>
         </div>
     </div>
     <br />
-    <button type="button" @onclick="@OnClick" class="btn btn-primary">Primary</button>
+    <div class="d-grid gap-2">
+        <button type="button" @onclick="@OnClick" class="btn btn-primary">Apply Filter</button>
+    </div>
     <br />
 </div>
 
@@ -46,11 +48,15 @@
 </div>
 
 
+
 @code {
+    private int Year = DateTime.Now.Year;
     private string[] cachedWords = Array.Empty<string>();
     private string[] filteredWords = Array.Empty<string>();
 
     private string CharsNotIcluded { get; set; } = "";
+
+    private char NullChar = '\0';
 
     private CharIndexMetaPair CharAtIndex_0 { get; set; } = new();
     private CharIndexMetaPair CharAtIndex_1 { get; set; } = new();
@@ -64,9 +70,9 @@
         filteredWords = cachedWords;
     }
 
-    private void  OnClick()
+    private void OnClick()
     {
-        filteredWords = GetWordsThatExcludesChars(cachedWords, CharsNotIcluded.ToCharArray());
+        filteredWords = GetWordsThatExcludesChars(filteredWords, CharsNotIcluded.ToCharArray());
 
         var CharsAtWrongIndex = new CharIndexMetaPair[] 
         { 
@@ -124,9 +130,9 @@
         return eligibleWords.ToArray();
 
         ///Local Functions
-        bool IsCharArrayEmpty(CharIndexMetaPair[] filterChars) => !filterChars.Any(c => c.Char != '\0');
+        bool IsCharArrayEmpty(CharIndexMetaPair[] filterChars) => !filterChars.Any(c => c.Char != NullChar);
 
-        bool IsNullChar(char c) => c == '\0';
+        bool IsNullChar(char c) => c == NullChar;
 
         bool IsCharInWordAndAtCorrectIndex(string word, CharIndexMetaPair charIndexMetaPair, int charIndex)
         {

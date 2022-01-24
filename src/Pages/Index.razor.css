@@ -15,17 +15,18 @@
 }
 
 .grid-container {
-    margin-top:40px;
+    margin: 10px 0px;
     max-width: 300px;
-    display: flex;
-    flex-direction:column;
-    align-items: center;
-    justify-content: center;
 }
 
 .words-container {
-    scroll-behavior:auto;
-    max-height: 500px;
+    padding: 4px;
+    height: calc(95vh - 300px);
+    overflow-x: hidden;
+    overflow-y: auto;
+    text-align: justify;
+    border: 1px solid lightgrey;
+    border-radius: 8px
 }
 
 
