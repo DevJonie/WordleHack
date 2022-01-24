@@ -72,7 +72,7 @@
 
     private void OnClick()
     {
-        filteredWords = GetWordsThatExcludesChars(filteredWords, CharsNotIcluded.ToCharArray());
+        filteredWords = GetWordsThatExcludesChars(cachedWords, CharsNotIcluded.ToLower().ToCharArray());
 
         var CharsAtWrongIndex = new CharIndexMetaPair[] 
         { 
@@ -136,7 +136,11 @@
 
         bool IsCharInWordAndAtCorrectIndex(string word, CharIndexMetaPair charIndexMetaPair, int charIndex)
         {
-            if (charIndexMetaPair.IndexMeta)
+            charIndexMetaPair.Char = Char.IsLower(charIndexMetaPair.Char) 
+                ? charIndexMetaPair.Char
+                : Char.ToLower(charIndexMetaPair.Char);
+
+    if (charIndexMetaPair.IndexMeta)
             {
                 return charIndexMetaPair.Char == (word.ToCharArray())[charIndex];
             }
