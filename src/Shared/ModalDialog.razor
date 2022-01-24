@@ -1,0 +1,31 @@
+﻿<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal"  @onclick="@ToggleDialog">
+  How to?
+</button>
+
+@if (ShowDialog)
+{
+    <div class="modal fade show" id="exampleModal" style="display:block; background-color: rgba(10,10,10,.8);" aria-labelledby="exampleModalLabel" aria-modal="true" role="dialog">
+      <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">How to?</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="@ToggleDialog"></button>
+          </div>
+          <div class="modal-body">
+            <img src="./images/howto.jpg" class="img-fluid" alt="How to?"/>
+          </div>
+        </div>
+      </div>
+    </div>
+}
+
+@code {
+    public bool ShowDialog { get; set; } 
+
+    private void ToggleDialog()
+    {
+        ShowDialog = !ShowDialog;
+        StateHasChanged();
+    }
+ 
+}
