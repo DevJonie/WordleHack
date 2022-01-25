@@ -66,6 +66,7 @@
     protected override async Task OnInitializedAsync()
     {
         cachedWords = await Http.GetFromJsonAsync<List<string>>("sample-data/words.json") ?? new();
+        filteredWords = FilterWordsWithRepeatingChars(cachedWords);
     }
 
     private void OnClick()
@@ -150,6 +151,10 @@
         ///End Local Function
     }
 
+    private IEnumerable<string> FilterWordsWithRepeatingChars(IEnumerable<string> words)
+    {
+        return words.Where(c => c.Distinct().Count() == c.Length);
+    }
 
 
     class CharIndexMetaPair
