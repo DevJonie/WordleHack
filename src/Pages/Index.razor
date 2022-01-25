@@ -67,6 +67,7 @@
     {
         cachedWords = await Http.GetFromJsonAsync<List<string>>("sample-data/words.json") ?? new();
         filteredWords = FilterWordsWithRepeatingChars(cachedWords);
+        filteredWords = ShuffleWords(filteredWords);
     }
 
     private void OnClick()
@@ -156,6 +157,11 @@
         return words.Where(c => c.Distinct().Count() == c.Length);
     }
 
+    private IEnumerable<string> ShuffleWords(IEnumerable<string> words)
+    {
+        var rnd = new Random();
+        return words.OrderBy(w => rnd.Next());
+    }
 
     class CharIndexMetaPair
     {
