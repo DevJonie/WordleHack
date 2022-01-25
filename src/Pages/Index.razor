@@ -50,9 +50,8 @@
 
 
 @code {
-    private int Year = DateTime.Now.Year;
-    private string[] cachedWords = Array.Empty<string>();
-    private string[] filteredWords = Array.Empty<string>();
+    private IEnumerable<string> cachedWords = Array.Empty<string>();
+    private IEnumerable<string> filteredWords = Array.Empty<string>();
 
     private string CharsNotIcluded { get; set; } = "";
 
@@ -66,8 +65,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        cachedWords = await Http.GetFromJsonAsync<string[]>("sample-data/words.json") ?? Array.Empty<string>();
-        filteredWords = cachedWords;
+        cachedWords = await Http.GetFromJsonAsync<List<string>>("sample-data/words.json") ?? new();
     }
 
     private void OnClick()
@@ -87,18 +85,17 @@
     }
 
 
-    private string[] GetWordsThatExcludesChars(string[] words, char[] notIncChar)
+    private IEnumerable<string> GetWordsThatExcludesChars(IEnumerable<string> words, char[] notIncChar)
     {
         if (!notIncChar.Any()) return words;
 
         var filteredWords = words
-            .Where(c => c.IndexOfAny(notIncChar) < 0)
-            .ToArray();
+            .Where(c => c.IndexOfAny(notIncChar) < 0);
 
         return filteredWords is null || !filteredWords.Any() ? words : filteredWords; 
     }
 
-    private string[] FilterWordsByCharIndexMeta(string[] words, CharIndexMetaPair[] charIndexMetaPairs)
+    private IEnumerable<string> FilterWordsByCharIndexMeta(IEnumerable<string> words, CharIndexMetaPair[] charIndexMetaPairs)
     {
         if (IsCharArrayEmpty(charIndexMetaPairs)) return words;
 
@@ -127,7 +124,7 @@
             }
         }
 
-        return eligibleWords.ToArray();
+        return eligibleWords;
 
         ///Local Functions
         bool IsCharArrayEmpty(CharIndexMetaPair[] filterChars) => !filterChars.Any(c => c.Char != NullChar);
@@ -140,7 +137,7 @@
                 ? charIndexMetaPair.Char
                 : Char.ToLower(charIndexMetaPair.Char);
 
-    if (charIndexMetaPair.IndexMeta)
+            if (charIndexMetaPair.IndexMeta)
             {
                 return charIndexMetaPair.Char == (word.ToCharArray())[charIndex];
             }
@@ -152,6 +149,8 @@
         }
         ///End Local Function
     }
+
+
 
     class CharIndexMetaPair
     {
